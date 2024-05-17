@@ -1,0 +1,11 @@
+[package]
+name = "blurbird_vm_debugger"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bluebird_vm = {path = "../bluebird_vm"}
+eframe = {version = "0.27.2", features = ["android-native-activity"]}
+egui = "0.27.2"

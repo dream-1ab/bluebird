@@ -1,0 +1,554 @@
+{
+  "name": "bluebird_asm",
+  "rules": {
+    "source_file": {
+      "type": "REPEAT",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "label"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "add_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "subtract_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "multiplication_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "division_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "modulo_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "and_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "or_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "not_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "jump_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "compare"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "branch_equals"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "branch_not_equals"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "branch_greater_than"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "branch_less_than"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "push_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "pop_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "store_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "call_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "ret_op"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "syscall_op"
+          }
+        ]
+      }
+    },
+    "decimal_number": {
+      "type": "PATTERN",
+      "value": "[0-9]+"
+    },
+    "absolute_memory_address": {
+      "type": "PATTERN",
+      "value": "\\[[0-9]+\\]"
+    },
+    "relative_memory_address": {
+      "type": "PATTERN",
+      "value": "\\[-[0-9]+\\]"
+    },
+    "register": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "PC"
+        },
+        {
+          "type": "STRING",
+          "value": "SP"
+        }
+      ]
+    },
+    "op_value": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "decimal_number"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "absolute_memory_address"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "relative_memory_address"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "register"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "label"
+        }
+      ]
+    },
+    "label": {
+      "type": "PATTERN",
+      "value": "[0-9a-z_]+:"
+    },
+    "add_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "ADD"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "subtract_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "SUB"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "multiplication_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "MUL"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "division_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "DIV"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "modulo_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "MOD"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "and_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "AND"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "or_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "OR"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "not_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "NOT"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "jump_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "JMP"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "compare": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "CMP"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "branch_equals": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "BEQ"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "label"
+        }
+      ]
+    },
+    "branch_not_equals": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "BNE"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "label"
+        }
+      ]
+    },
+    "branch_greater_than": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "BGT"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "label"
+        }
+      ]
+    },
+    "branch_less_than": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "BLT"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "label"
+        }
+      ]
+    },
+    "push_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "PUSH"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "decimal_number"
+        }
+      ]
+    },
+    "pop_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "POP"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "decimal_number"
+        }
+      ]
+    },
+    "store_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "ST"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        },
+        {
+          "type": "STRING",
+          "value": ","
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "call_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "CALL"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    },
+    "ret_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "RET"
+        }
+      ]
+    },
+    "syscall_op": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "SYSCALL"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "op_value"
+        }
+      ]
+    }
+  },
+  "extras": [
+    {
+      "type": "PATTERN",
+      "value": "\\s"
+    }
+  ],
+  "conflicts": [],
+  "precedences": [],
+  "externals": [],
+  "inline": [],
+  "supertypes": []
+}
