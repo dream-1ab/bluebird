@@ -78,9 +78,65 @@
 
 module.exports = grammar({
   name: "bluebird_asm",
+  extras: $ => [
+    $.comment,
+    /\s/
+  ],
   rules: {
     source_file: $ => repeat(choice(
-      $.label,
+      $.label_decleration,
+      $._binary_operators,
+      $._branch_operators,
+      $._memory_operators,
+      $._bitwise_operators,
+    )),
+    comment: $ => choice(
+      /;{1}.*/,
+      // /(\/\/){1}.+/,
+      // /#{1}.+/
+    ),
+    _data_type: $ => choice(
+      "U8",
+      "I8",
+      "U16",
+      "I16",
+      "U32",
+      "I32",
+      "U64",
+      "I64",
+      "F32",
+      "F64",
+    ),
+    //common instructions
+    floating_point_number: $ => /-?\d+\.{1}\d*/,
+    negative_integer_number: $ => /-{1}[0-9]+/,
+    positive_integer_number: $ => /\+{0,1}[0-9]+/,
+    _decimal_number: $ => choice(
+      $.negative_integer_number,
+      $.positive_integer_number
+    ),
+    absolute_memory_location: $ => /\[[0-9]+\]/,
+    relative_memory_location: $ => /\[-[0-9]+\]/,
+    register: $ => choice(
+      "PC", //program counter
+      "SP", //stack pointer
+      // "CMPR", //comparison register Right side value
+      // "CMPL", //comparison register Left side value
+    ),
+    writable_location: $ => choice(
+      $.absolute_memory_location,
+      $.relative_memory_location,
+      $.register,
+    ),
+    readable_location: $ => choice(
+      $._decimal_number,
+      $.floating_point_number,
+      $.label_definition,
+      $.writable_location,
+    ),
+    label_decleration: $ => /[0-9a-z_]+:/,
+    label_definition: $ => /[0-9a-z_]+/,
+    _binary_operators: $ => choice(
       $.add_op,
       $.subtract_op,
       $.multiplication_op,
@@ -89,149 +145,169 @@ module.exports = grammar({
       $.and_op,
       $.or_op,
       $.not_op,
+      $.compare_op,
+    ),
+    _bitwise_operators: $ => choice(
+      $.shift_left_op,
+      $.shift_right_op,
+
+    ),
+    _branch_operators: $ => choice(
       $.jump_op,
-      $.compare,
-      $.branch_equals,
-      $.branch_not_equals,
-      $.branch_greater_than,
-      $.branch_less_than,
-      $.push_op,
-      $.pop_op,
-      $.store_op,
+      $.branch_equals_op,
+      $.branch_not_equals_op,
+      $.branch_greater_than_op,
+      $.branch_less_than_op,
       $.call_op,
       $.ret_op,
       $.syscall_op,
-    )),
-
-    //common instructions
-    decimal_number: $ => /[0-9]+/,
-    absolute_memory_address: $ => /\[[0-9]+\]/,
-    relative_memory_address: $ => /\[-[0-9]+\]/,
-    register: $ => choice(
-      "PC", //program counter
-      "SP", //stack pointer
-      // "CMPR", //comparison register Right side value
-      // "CMPL", //comparison register Left side value
     ),
-    op_value: $ => choice(
-      $.decimal_number,
-      $.absolute_memory_address,
-      $.relative_memory_address,
-      $.register,
-      $.label
+    _memory_operators: $ => choice(
+      $.push_op,
+      $.pop_op,
+      $.store_op,
     ),
-    label: $ => /[0-9a-z_]+:/,
-    
     //operators
     add_op: $ => seq(
       "ADD",
-      $.op_value,
+      $._data_type,
+      field("left", $.readable_location,),
       ",",
-      $.op_value,
+      field("right", $.readable_location,),
       ",",
-      $.op_value,
+      field("save_to", $.writable_location,)
     ),
     subtract_op: $ => seq(
       "SUB",
-      $.op_value,
+      $._data_type,
+      field("left", $.readable_location,),
       ",",
-      $.op_value,
+      field("right", $.readable_location,),
       ",",
-      $.op_value,
+      field("save_to", $.writable_location,)
     ),
     multiplication_op: $ => seq(
       "MUL",
-      $.op_value,
+      $._data_type,
+      field("left", $.readable_location,),
       ",",
-      $.op_value,
+      field("right", $.readable_location,),
       ",",
-      $.op_value,
+      field("save_to", $.writable_location,)
     ),
     division_op: $ => seq(
       "DIV",
-      $.op_value,
+      $._data_type,
+      field("left", $.readable_location,),
       ",",
-      $.op_value,
+      field("right", $.readable_location,),
       ",",
-      $.op_value,
+      field("save_to", $.writable_location,)
     ),
     modulo_op: $ => seq(
       "MOD",
-      $.op_value,
+      $._data_type,
+      field("left", $.readable_location,),
       ",",
-      $.op_value,
+      field("right", $.readable_location,),
       ",",
-      $.op_value,
+      field("save_to", $.writable_location,)
     ),
     and_op: $ => seq(
       "AND",
-      $.op_value,
+      $._data_type,
+      field("left", $.readable_location,),
       ",",
-      $.op_value,
+      field("right", $.readable_location,),
       ",",
-      $.op_value,
+      field("save_to", $.writable_location,)
     ),
     or_op: $ => seq(
       "OR",
-      $.op_value,
+      $._data_type,
+      field("left", $.readable_location,),
       ",",
-      $.op_value,
+      field("right", $.readable_location,),
       ",",
-      $.op_value,
+      field("save_to", $.writable_location,)
     ),
     not_op: $ => seq(
       "NOT",
-      $.op_value,
+      $._data_type,
+      $.readable_location,
       ",",
-      $.op_value,
+      $.writable_location,
     ),
+    compare_op: $ => seq(
+      "CMP",
+      $._data_type,
+      $.readable_location,
+      ",",
+      $.writable_location,
+    ),
+
+    shift_left_op: $ => seq(
+      "SHL",
+      $._data_type,
+      field("left", $.readable_location,),
+      ",",
+      field("right", $.readable_location,),
+      ",",
+      field("save_to", $.writable_location,)
+    ),
+
+    shift_right_op: $ => seq(
+      "SHR",
+      $._data_type,
+      field("left", $.readable_location,),
+      ",",
+      field("right", $.readable_location,),
+      ",",
+      field("save_to", $.writable_location,)
+    ),
+
     jump_op: $ => seq(
       "JMP",
-      $.op_value
+      field("destination", $.readable_location),
     ),
-    compare: $ => seq(
-      "CMP",
-      $.op_value,
-      ",",
-      $.op_value,
-    ),
-    branch_equals: $ => seq(
+    branch_equals_op: $ => seq(
       "BEQ",
-      $.label,
+      field("destination", $.readable_location),
     ),
-    branch_not_equals: $ => seq(
+    branch_not_equals_op: $ => seq(
       "BNE",
-      $.label,
+      field("destination", $.readable_location),
     ),
-    branch_greater_than: $ => seq(
+    branch_greater_than_op: $ => seq(
       "BGT",
-      $.label,
+      field("destination", $.readable_location),
     ),
-    branch_less_than: $ => seq(
+    branch_less_than_op: $ => seq(
       "BLT",
-      $.label,
+      field("destination", $.readable_location),
     ),
 
     //Memory op
     push_op: $ => seq(
       "PUSH",
-      $.decimal_number
+      field("size", $._decimal_number)
     ),
     pop_op: $ => seq(
       "POP",
-      $.decimal_number
+      field("size", $._decimal_number)
     ),
     store_op: $ => seq(
       "ST",
-      $.op_value,
+      $._data_type,
+      field("value", $.readable_location,),
       ",",
-      $.op_value,
+      field("save_to", $.writable_location,)
     ),
     call_op: $ => seq(
       "CALL",
-      $.op_value,
+      field("destination", $.readable_location),
     ),
     ret_op: $ => seq("RET"),
-    syscall_op: $ => seq("SYSCALL", $.op_value),
+    syscall_op: $ => seq("SYSCALL", $.readable_location, $.readable_location, $.readable_location),
   }
 })

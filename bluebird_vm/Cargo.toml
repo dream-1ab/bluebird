@@ -9,7 +9,9 @@ edition = "2021"
 [lib]
 path = "src/lib.rs"
 crate-type = ["rlib"]
+proc-macro = true
 
 [dependencies]
 tree-sitter = "0.22.6"
 tree-sitter-bluebird-asm = {path = "../tree-sitter-bluebird-asm"}
+bluebird_vm_proc_macro = {path = "../bluebird_vm_proc_macro"}

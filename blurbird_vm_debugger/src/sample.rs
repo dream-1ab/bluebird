@@ -1,3 +1,4 @@
+
 /**
  * @author مۇختەرجان مەخمۇت
  * @email ug-project@outlook.com
@@ -52,7 +53,8 @@ impl VirtualMachine {
         ];
         let handler = HANDLERS[op as usize];
         handler(self, op);
-
+        // impl_add!(u8)
+        
     }
 }
 
